@@ -1,0 +1,64 @@
+baseURL = "https://example.org/"  # CI가 GitHub Pages URL로 자동 덮어씀
+languageCode = "ko-kr"
+defaultContentLanguage = "ko"
+title = "흑요석"
+theme = "PaperMod"
+enableRobotsTXT = true
+hasCJKLanguage = true
+timeZone = "Asia/Seoul"
+
+[pagination]
+  pagerSize = 10
+
+[params]
+  description = "수학·AI·로보틱스 학습 노트를 완성된 글로 정리한 블로그"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  TocOpen = false
+  math = true
+
+  [params.homeInfoParams]
+    Title = "흑요석"
+    Content = "측도론, 제어이론, 강화학습 등 공부한 내용을 글로 정리합니다."
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "글"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "tags"
+    name = "태그"
+    url = "/tags/"
+    weight = 20
+  [[menu.main]]
+    identifier = "search"
+    name = "검색"
+    url = "/search/"
+    weight = 30
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]  # JSON은 PaperMod 검색용
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)'], ['$', '$']]
+  [markup.highlight]
+    noClasses = false
+    style = "github"
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
