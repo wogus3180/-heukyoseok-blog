@@ -31,6 +31,27 @@ WIKILINK_RE = re.compile(r"(!?)\[\[([^\]|#]+)(?:#([^\]|]+))?(?:\|([^\]]+))?\]\]"
 CALLOUT_RE = re.compile(r"^(>\s*)\[!\w+\][+-]?[ \t]*(.*)$", re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$")
 
+# 수식 안의 `=` 나 `-` 단독 줄은 CommonMark가 Setext 제목 밑줄로 오인해서
+# 수식을 통째로 망가뜨린다 (예: "\mathcal P(\Omega)\n=\n\{...\}"). 이스케이프된
+# `\{`, `\{` 도 일반 텍스트로 들어가면 백슬래시 이스케이프 규칙에 걸려 사라진다.
+# 그래서 수식은 마크다운이 절대 손대지 않는 코드펜스/코드스팬으로 감싸서
+# 원본 그대로 보존한 뒤, 클라이언트에서 KaTeX가 그 텍스트를 직접 렌더링한다.
+BLOCK_MATH_RE = re.compile(r"\$\$(.*?)\$\$|\\\[(.*?)\\\]", re.DOTALL)
+INLINE_MATH_RE = re.compile(r"\$([^\$\n]+?)\$|\\\((.*?)\\\)")
+
+
+def protect_math(body: str) -> str:
+    def block_repl(m: re.Match) -> str:
+        content = (m.group(1) if m.group(1) is not None else m.group(2)).strip("\n")
+        return f"\n```math\n{content}\n```\n"
+
+    def inline_repl(m: re.Match) -> str:
+        content = (m.group(1) if m.group(1) is not None else m.group(2)).replace("`", "")
+        return f"`\\({content}\\)`"
+
+    body = BLOCK_MATH_RE.sub(block_repl, body)
+    return INLINE_MATH_RE.sub(inline_repl, body)
+
 
 def extract_leading_title(body: str) -> tuple[str | None, str]:
     """본문의 첫 non-empty 줄이 H1이면 그것을 제목으로 떼어낸다.
@@ -104,6 +125,8 @@ def find_asset(vault: Path, name: str) -> Path | None:
 def convert_body(
     body: str, vault: Path, published: dict[str, str], static_img: Path
 ) -> str:
+    body = protect_math(body)
+
     def repl(m: re.Match) -> str:
         embed, target, heading, alias = m.group(1), m.group(2).strip(), m.group(3), m.group(4)
         if embed:

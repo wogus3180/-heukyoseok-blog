@@ -1,14 +1,16 @@
 {{ if or .Params.math .Site.Params.math }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '\\[', right: '\\]', display: true},
-      {left: '$', right: '$', display: false},
-      {left: '\\(', right: '\\)', display: false}
-    ],
-    throwOnError: false
-  });"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" crossorigin="anonymous"
+  onload="
+    document.querySelectorAll('div.math-block').forEach(function (el) {
+      katex.render(el.textContent, el, { displayMode: true, throwOnError: false });
+    });
+    // 헤딩 안의 인라인 수식은 Hugo가 커스텀 codespan 훅을 타지 않고 기본
+    // <code>로 떨어뜨리는 경우가 있어, span.math-inline과 code를 함께 검사한다.
+    document.querySelectorAll('span.math-inline, code').forEach(function (el) {
+      var text = el.textContent.trim();
+      if (!(text.slice(0, 2) === '\\(' && text.slice(-2) === '\\)')) return;
+      katex.render(text.slice(2, -2), el, { displayMode: false, throwOnError: false });
+    });
+  "></script>
 {{ end }}
