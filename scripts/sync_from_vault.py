@@ -29,7 +29,24 @@ MARKER = "vault_source"  # 이 스크립트가 만든 포스트임을 표시하�
 FM_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n?", re.DOTALL)
 WIKILINK_RE = re.compile(r"(!?)\[\[([^\]|#]+)(?:#([^\]|]+))?(?:\|([^\]]+))?\]\]")
 CALLOUT_RE = re.compile(r"^(>\s*)\[!\w+\][+-]?[ \t]*(.*)$", re.MULTILINE)
-H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
+H1_RE = re.compile(r"^#\s+(.+?)\s*$")
+
+
+def extract_leading_title(body: str) -> tuple[str | None, str]:
+    """본문의 첫 non-empty 줄이 H1이면 그것을 제목으로 떼어낸다.
+
+    노트 중간에 나오는 `# 요약`, `# 1. ...` 같은 섹션 헤딩까지 제목으로
+    오인하지 않도록, 첫 줄일 때만 승격한다.
+    """
+    lines = body.splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        m = H1_RE.match(line)
+        if m:
+            return m.group(1).strip(), "".join(lines[:i] + lines[i + 1:])
+        break
+    return None, body
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
@@ -171,11 +188,14 @@ def main() -> int:
     written: set[str] = set()
     for path, fm, body in to_publish:
         slug = published[path.stem]
-        title = str(fm.get("title") or path.stem)
-        h1 = H1_RE.search(body)
-        if h1:
-            title = fm.get("title") or h1.group(1).strip()
-            body = body[: h1.start()] + body[h1.end():]
+        leading_title, stripped_body = extract_leading_title(body)
+        if fm.get("title"):
+            title = str(fm["title"])  # 본문은 그대로 둔다 (첫 H1이 실제 섹션 제목일 수 있음)
+        elif leading_title:
+            title = leading_title
+            body = stripped_body
+        else:
+            title = path.stem
         rel = path.relative_to(vault).as_posix()
         out = build_frontmatter(title, fm, rel) + convert_body(body, vault, published, static_img)
         dest = posts_dir / f"{slug}.md"
