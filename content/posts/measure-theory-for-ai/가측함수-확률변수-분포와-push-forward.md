@@ -1,5 +1,5 @@
 ---
-title: "가측함수, 확률변수, 분포와 Push-forward"
+title: "3강. 가측함수, 확률변수, 분포와 Push-forward"
 date: 2026-08-26
 lastmod: 2026-09-03
 draft: false
@@ -10,7 +10,7 @@ series: "Measure Theory for AI"
 series_order: 3
 aliases:
   - "/posts/가측함수-확률변수-분포와-push-forward/"
-vault_source: "Atlas/가측함수, 확률변수, 분포와 Push-forward.md"
+vault_source: "Distillation/Study/Measure Theory for AI/원고/3강. 가측함수, 확률변수, 분포와 Push-forward.md"
 ---
 
 앞에서는 확률공간
