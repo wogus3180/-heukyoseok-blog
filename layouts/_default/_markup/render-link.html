@@ -1,0 +1,6 @@
+{{- /* 볼트 [[링크]]가 변환된 루트 상대 경로(/posts/...)에 baseURL 의 하위 경로
+       (GitHub Pages 의 /-heukyoseok-blog/)를 붙인다. 외부 URL 과 #앵커는 그대로 둔다.
+       relURL 은 입력이 "/" 로 시작하면 하위 경로를 생략하므로 앞의 "/" 를 떼고 넘긴다. */ -}}
+{{- $dest := .Destination -}}
+{{- if strings.HasPrefix $dest "/" -}}{{- $dest = relURL (strings.TrimPrefix "/" $dest) -}}{{- end -}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text }}</a>

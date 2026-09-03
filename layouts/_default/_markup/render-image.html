@@ -1,0 +1,4 @@
+{{- /* ![[이미지]] 가 변환된 /images/... 경로에 baseURL 의 하위 경로를 붙인다. */ -}}
+{{- $src := .Destination -}}
+{{- if strings.HasPrefix $src "/" -}}{{- $src = relURL (strings.TrimPrefix "/" $src) -}}{{- end -}}
+<img src="{{ $src | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">

@@ -1,8 +1,9 @@
 ---
 title: "Measure Theory for AI"
 layout: "series"
-description: "해석학을 따로 배운 적 없는 AI 전공자를 위한 측도론 강의 노트. σ-대수에서 시작해 확률 커널과 SDE까지 간다."
 ShowToc: false
+vault_source: "Distillation/Study/Measure Theory for AI/Measure Theory for AI.md"
+description: "해석학을 따로 배운 적 없는 AI 전공자를 위한 측도론 강의 노트. σ-대수에서 시작해 확률 커널과 SDE까지 간다."
 summary: "σ-대수부터 확률 커널과 SDE까지, ML 논문의 측도론적 언어를 읽기 위한 강의 노트 시리즈."
 upcoming_title: "앞으로 올라올 강"
 upcoming:
@@ -18,8 +19,6 @@ upcoming:
 
 > - **대상** — 해석학 배경이 없다고 가정한 AI 전공 대학원생
 > - **목표** — ML 논문에 나오는 측도론적 언어(σ-대수, 밀도, KL, 조건부 기댓값, 확률 커널, SDE)를 읽고 쓸 수 있게 되는 것
-> - **원칙** — 증명보다 동기와 반례. 매 강은 “ML에서 이게 없으면 깨지는 지점”에서 출발하고, 정리는 API처럼 다룬다 (가설·결론·깨지는 조건만 정확히)
 
-번호는 커리큘럼상의 강 번호다. 1강(왜 측도론인가)에서 다루려던 것 — 모든 부분집합에 길이를 줄 수는 없다는 사실, Vitali 집합 — 은 2강 글의 0절과 8절이 그대로 흡수했으므로, 읽는 순서는 **2강부터**다.
 
 주교재는 Rosenthal, *A First Look at Rigorous Probability Theory*. 참고로 Axler, *Measure, Integration & Real Analysis*와 Tao, *An Introduction to Measure Theory* (둘 다 무료 공개)를 함께 쓴다.
