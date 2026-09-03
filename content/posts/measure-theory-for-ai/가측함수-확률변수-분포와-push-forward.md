@@ -5,6 +5,11 @@ lastmod: 2026-09-03
 draft: false
 math: true
 description: "확률변수가 왜 가측함수여야 하는지에서 출발해, 분포를 push-forward 측도로 정의한다. CDF 하나가 분포 전체를 결정하는 이유, 이산도 연속도 아닌 Cantor 분포, 그리고 역변환 샘플링·reparameterization trick·normalizing flow·GAN이 모두 같은 push-forward라는 것까지 정리한다."
+summary: "확률변수가 왜 가측함수여야 하는지에서 출발해, 분포를 push-forward 측도로 정의한다. CDF 하나가 분포 전체를 결정하는 이유, 이산도 연속도 아닌 Cantor 분포, 그리고 역변환 샘플링·reparameterization trick·normalizing flow·GAN이 모두 같은 push-forward라는 것까지 정리한다."
+series: "Measure Theory for AI"
+series_order: 3
+aliases:
+  - "/posts/가측함수-확률변수-분포와-push-forward/"
 vault_source: "Atlas/가측함수, 확률변수, 분포와 Push-forward.md"
 ---
 

@@ -9,7 +9,9 @@
   2. [[위키링크]] → 대상도 공개 노트면 내부 링크, 아니면 일반 텍스트로 바꾼다.
   3. ![[이미지]] 임베드 → static/images/ 로 복사하고 표준 마크다운 이미지로 바꾼다.
   4. Obsidian 콜아웃(> [!note]) 마커를 제거해 일반 인용구로 만든다.
-  5. content/posts/<slug>.md 로 쓰고, 더 이상 publish 가 아닌 글은 삭제한다(미러링).
+  5. `series: 이름`이 있으면 content/posts/<시리즈-슬러그>/<slug>.md, 없으면
+     content/posts/<slug>.md 로 쓰고, 더 이상 publish 가 아닌 글은 삭제한다(미러링).
+     시리즈 폴더에 목차 페이지(_index.md)가 없으면 최소 형태로 만들어 둔다.
 
 의존성: 표준 라이브러리만 사용.
 """
@@ -154,7 +156,7 @@ def convert_body(
     return body.strip() + "\n"
 
 
-def build_frontmatter(title: str, fm: dict, rel_path: str) -> str:
+def build_frontmatter(title: str, fm: dict, rel_path: str, slug: str) -> str:
     today = date.today().isoformat()
     created = str(fm.get("creation_date") or today)
     tags = fm.get("tags") or []
@@ -172,10 +174,26 @@ def build_frontmatter(title: str, fm: dict, rel_path: str) -> str:
         lines.append("tags:")
         lines += [f'  - "{t}"' for t in tags]
     if fm.get("description"):
+        # summary 를 같이 넣어야 목록 카드가 본문 첫 문단(=보호된 LaTeX 원문) 대신
+        # 설명을 보여준다.
         lines.append(f'description: "{fm["description"]}"')
+        lines.append(f'summary: "{fm["description"]}"')
+    series = str(fm.get("series") or "").strip()
+    if series:
+        lines.append(f'series: "{series}"')
+        order = str(fm.get("series_order") or "").strip()
+        if order:
+            lines.append(f"series_order: {order}")
+        # 시리즈 폴더로 옮기기 전의 평면 URL(/posts/<slug>/)로 들어오던 링크를 살려둔다.
+        lines.append("aliases:")
+        lines.append(f'  - "/posts/{slug}/"')
     lines.append(f'{MARKER}: "{rel_path}"')
     lines.append("---")
     return "\n".join(lines) + "\n\n"
+
+
+def series_index_stub(name: str) -> str:
+    return f'---\ntitle: "{name}"\nlayout: "series"\n---\n'
 
 
 def main() -> int:
@@ -203,14 +221,19 @@ def main() -> int:
         if is_truthy(fm.get("publish", "")):
             to_publish.append((path, fm, body))
 
-    published: dict[str, str] = {
-        p.stem: str(fm.get("slug") or slugify(p.stem)) for p, fm, _ in to_publish
-    }
+    # 노트 이름 → (슬러그, posts/ 기준 상대경로). 시리즈가 있으면 하위 폴더로 들어간다.
+    routes: dict[str, tuple[str, str]] = {}
+    for p, fm, _ in to_publish:
+        slug = str(fm.get("slug") or slugify(p.stem))
+        series = str(fm.get("series") or "").strip()
+        routes[p.stem] = (slug, f"{slugify(series)}/{slug}" if series else slug)
+    published: dict[str, str] = {stem: rel for stem, (_, rel) in routes.items()}
 
     # 2) 변환 및 쓰기
     written: set[str] = set()
+    series_dirs: dict[str, str] = {}  # 폴더 슬러그 → 시리즈 표시 이름
     for path, fm, body in to_publish:
-        slug = published[path.stem]
+        slug, route = routes[path.stem]
         leading_title, stripped_body = extract_leading_title(body)
         if fm.get("title"):
             title = str(fm["title"])  # 본문은 그대로 둔다 (첫 H1이 실제 섹션 제목일 수 있음)
@@ -220,25 +243,47 @@ def main() -> int:
         else:
             title = path.stem
         rel = path.relative_to(vault).as_posix()
-        out = build_frontmatter(title, fm, rel) + convert_body(body, vault, published, static_img)
-        dest = posts_dir / f"{slug}.md"
-        written.add(dest.name)
+        out = build_frontmatter(title, fm, rel, slug) + convert_body(
+            body, vault, published, static_img
+        )
+        dest = posts_dir / f"{route}.md"
+        written.add(f"{route}.md")
+        if "/" in route:
+            series_dirs[route.split("/")[0]] = str(fm.get("series")).strip()
         if args.dry_run:
             print(f"[dry] {rel} -> {dest.relative_to(args.site)}")
         else:
+            dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(out, encoding="utf-8", newline="\n")
             print(f"[ok]  {rel} -> {dest.relative_to(args.site)}")
 
-    # 3) 더 이상 publish 가 아닌 글 제거 (이 스크립트가 만든 것만)
-    for existing in posts_dir.glob("*.md"):
-        if existing.name in written:
+    # 3) 시리즈 폴더의 목차 페이지는 손으로 쓰는 것이므로, 없을 때만 만들어 둔다.
+    for dir_slug, name in sorted(series_dirs.items()):
+        index = posts_dir / dir_slug / "_index.md"
+        if index.exists():
+            continue
+        if args.dry_run:
+            print(f"[dry] new {index.relative_to(args.site)}")
+        else:
+            index.parent.mkdir(parents=True, exist_ok=True)
+            index.write_text(series_index_stub(name), encoding="utf-8", newline="\n")
+            print(f"[new] {index.relative_to(args.site)}")
+
+    # 4) 더 이상 publish 가 아닌 글 제거 (이 스크립트가 만든 것만)
+    for existing in sorted(posts_dir.rglob("*.md")):
+        route = existing.relative_to(posts_dir).as_posix()
+        if route in written or existing.name == "_index.md":
             continue
         if MARKER in existing.read_text(encoding="utf-8")[:2000]:
             if args.dry_run:
-                print(f"[dry] remove {existing.name}")
+                print(f"[dry] remove {route}")
             else:
                 existing.unlink()
-                print(f"[rm]  {existing.name}")
+                print(f"[rm]  {route}")
+    if not args.dry_run:  # 글이 모두 빠져나간 시리즈 폴더 정리
+        for d in sorted((p for p in posts_dir.rglob("*") if p.is_dir()), reverse=True):
+            if not any(d.iterdir()):
+                d.rmdir()
 
     print(f"\n{len(written)}개 글 동기화 완료.")
     return 0

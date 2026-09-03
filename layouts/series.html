@@ -1,0 +1,42 @@
+{{- define "main" }}
+
+<header class="page-header">
+  {{- partial "breadcrumbs.html" . }}
+  <h1>{{ .Title }}</h1>
+  {{- with .Description }}
+  <div class="post-description">{{ . | markdownify }}</div>
+  {{- end }}
+</header>
+
+{{- with .Content }}
+<div class="post-content md-content">{{ . }}</div>
+{{- end }}
+
+{{/* 날짜순이 아니라 강 번호순으로 세운다. 시리즈는 쓴 순서가 아니라 읽는 순서가 있다. */}}
+{{- range .RegularPages.ByParam "series_order" }}
+<article class="post-entry">
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">{{ with .Params.series_order }}{{ . }}강 · {{ end }}{{ .Title }}</h2>
+  </header>
+  {{- with .Summary }}
+  <section class="entry-content">
+    <p>{{ . | plainify | htmlUnescape }}</p>
+  </section>
+  {{- end }}
+  <footer class="entry-footer">{{ partial "post_meta.html" . }}</footer>
+  <a class="entry-link" aria-label="{{ .Title | plainify }}" href="{{ .Permalink }}"></a>
+</article>
+{{- end }}
+
+{{- with .Params.upcoming }}
+<div class="post-content md-content">
+  <h2>{{ $.Params.upcoming_title | default "앞으로 올라올 글" }}</h2>
+  <ul>
+    {{- range . }}
+    <li>{{ . | markdownify }}</li>
+    {{- end }}
+  </ul>
+</div>
+{{- end }}
+
+{{- end }}
