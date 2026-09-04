@@ -12,5 +12,24 @@
       if (!(text.slice(0, 2) === '\\(' && text.slice(-2) === '\\)')) return;
       katex.render(text.slice(2, -2), el, { displayMode: false, throwOnError: false });
     });
+    // 목차는 헤딩 HTML을 plainify 해서 만들기 때문에 <code> 껍데기가 사라지고
+    // '\\(...\\)' 원문만 남는다. 링크 텍스트 안의 수식 구간을 직접 찾아 렌더링한다.
+    document.querySelectorAll('.toc a').forEach(function (el) {
+      var text = el.textContent;
+      if (text.indexOf('\\(') === -1) return;
+      var re = /\\\((.+?)\\\)/g;
+      el.setAttribute('aria-label', text.replace(re, '$1'));
+      el.textContent = '';
+      var last = 0, m;
+      re.lastIndex = 0;
+      while ((m = re.exec(text)) !== null) {
+        if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
+        var span = document.createElement('span');
+        katex.render(m[1], span, { displayMode: false, throwOnError: false });
+        el.appendChild(span);
+        last = re.lastIndex;
+      }
+      if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+    });
   "></script>
 {{ end }}
