@@ -175,11 +175,16 @@ def build_frontmatter(title: str, fm: dict, rel_path: str, slug: str) -> str:
     if tags:
         lines.append("tags:")
         lines += [f'  - "{t}"' for t in tags]
-    if fm.get("description"):
-        # summary 를 같이 넣어야 목록 카드가 본문 첫 문단(=보호된 LaTeX 원문) 대신
-        # 설명을 보여준다.
-        lines.append(f'description: "{fm["description"]}"')
-        lines.append(f'summary: "{fm["description"]}"')
+    # description 은 글 제목 바로 아래에 그대로 노출되고, summary 는 목록 카드에
+    # 쓰인다. summary 가 없으면 목록 카드가 본문 첫 문단(=보호된 LaTeX 원문)을
+    # 그대로 보여주므로 description 으로 채운다. 제목 아래는 짧게, 목록은 길게
+    # 가고 싶으면 노트에서 summary 를 따로 준다.
+    desc = str(fm.get("description") or "").strip()
+    summary = str(fm.get("summary") or desc).strip()
+    if desc:
+        lines.append(f"description: {yaml_quote(desc)}")
+    if summary:
+        lines.append(f"summary: {yaml_quote(summary)}")
     series = str(fm.get("series") or "").strip()
     if series:
         lines.append(f'series: "{series}"')
