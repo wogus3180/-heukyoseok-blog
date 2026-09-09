@@ -1573,7 +1573,7 @@ E[|XY|]\le\sqrt{E[X^2]}\sqrt{E[Y^2]}
 ```
 
 
-다음: 6강. L² 기하와 사영 정리
+다음: [6강. L² 기하와 사영 정리](/posts/measure-theory-for-ai/l2-기하와-사영-정리/)
 
 ---
 
