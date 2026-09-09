@@ -16,7 +16,10 @@
 {{- range .RegularPages.ByParam "series_order" }}
 <article class="post-entry">
   <header class="entry-header">
-    <h2 class="entry-hint-parent">{{ with .Params.series_order }}{{ . }}강 · {{ end }}{{ .Title }}</h2>
+    {{/* 제목이 이미 "6강."처럼 번호로 시작하면 "6강 · 6강. …"이 되므로 접두사를 생략한다. */}}
+    {{- $title := .Title }}
+    {{- $order := .Params.series_order }}
+    <h2 class="entry-hint-parent">{{ if and $order (not (hasPrefix $title (printf "%v강" $order))) }}{{ $order }}강 · {{ end }}{{ $title }}</h2>
   </header>
   {{- with .Summary }}
   <section class="entry-content">
