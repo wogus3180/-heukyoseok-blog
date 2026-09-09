@@ -22,9 +22,16 @@ timeZone = "Asia/Seoul"
   TocOpen = false
   math = true
 
+  # 조회수 집계: goatcounter.com 사이트 코드. 비워두면 스크립트가 붙지 않는다.
+  goatcounterCode = "heukyoseok"
+
   [params.homeInfoParams]
     Title = "흑요석"
     Content = "측도론, 제어이론, 강화학습 등 공부한 내용을 글로 정리합니다."
+
+  [params.analytics.google]
+    # Search Console 소유권 확인용 HTML 태그의 content 값
+    SiteVerificationTag = ""
 
 [menu]
   [[menu.main]]

@@ -33,3 +33,8 @@
     });
   "></script>
 {{ end }}
+
+{{ if and hugo.IsProduction site.Params.goatcounterCode }}
+<script data-goatcounter="https://{{ site.Params.goatcounterCode }}.goatcounter.com/count"
+  async src="//gc.zgo.at/count.js"></script>
+{{ end }}
