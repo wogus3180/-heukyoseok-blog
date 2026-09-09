@@ -57,6 +57,51 @@ def protect_math(body: str) -> str:
     return INLINE_MATH_RE.sub(inline_repl, body)
 
 
+# Hugo(goldmark)의 타이포그래퍼는 닫는 따옴표 뒤에 공백이나 구두점이 올 때만
+# `"` 를 `”` 로 바꾼다. 한국어는 조사가 따옴표에 바로 붙기 때문에
+# ("수렴한다"는, "부피"라고) 여는 쪽만 “ 로 바뀌고 닫는 쪽은 곧은 따옴표로
+# 남아 짝이 어긋난 채 렌더링된다. 그래서 동기화 시점에 미리 짝을 지어 바꾼다.
+# 덕분에 볼트 원본은 계속 곧은 따옴표로 편하게 써도 된다.
+CODE_FENCE_RE = re.compile(r"^```.*?^```", re.DOTALL | re.MULTILINE)
+CODE_SPAN_RE = re.compile(r"`[^`\n]*`")
+QUOTE_PAIR_RE = re.compile(r'"([^"\n]{1,300})"')
+_NUL = "\x00"
+
+
+def curly_quotes(body: str, rel_path: str = "") -> str:
+    """본문의 곧은 따옴표 쌍을 “ ” 로 바꾼다.
+
+    protect_math() 뒤에 호출해야 한다. 그 시점에는 수식이 이미 코드펜스/
+    코드스팬 안에 들어가 있으므로, 코드만 가려 두면 수식까지 함께 보호된다.
+    작은따옴표는 영어 축약형(don't)과 구별할 수 없어 건드리지 않는다.
+    """
+    masks: list[str] = []
+
+    def mask(m: re.Match) -> str:
+        masks.append(m.group(0))
+        return f"{_NUL}{len(masks) - 1}{_NUL}"
+
+    masked = CODE_SPAN_RE.sub(mask, CODE_FENCE_RE.sub(mask, body))
+
+    out = []
+    for line in masked.split("\n"):
+        n = line.count('"')
+        if n and n % 2:
+            # 짝이 맞지 않으면 손대지 않는다. 잘못 짝지으면 원문이 뒤틀린다.
+            print(
+                f"  [warn] 따옴표 짝이 안 맞아 건너뜀 ({rel_path}): {line.strip()[:60]}",
+                file=sys.stderr,
+            )
+        elif n:
+            line = QUOTE_PAIR_RE.sub(lambda m: f"“{m.group(1)}”", line)
+        out.append(line)
+    new = "\n".join(out)
+
+    for i, val in enumerate(masks):
+        new = new.replace(f"{_NUL}{i}{_NUL}", val)
+    return new
+
+
 def extract_leading_title(body: str) -> tuple[str | None, str]:
     """본문의 첫 non-empty 줄이 H1이면 그것을 제목으로 떼어낸다.
 
@@ -127,7 +172,8 @@ def find_asset(vault: Path, name: str) -> Path | None:
 
 
 def convert_body(
-    body: str, vault: Path, published: dict[str, str], static_img: Path
+    body: str, vault: Path, published: dict[str, str], static_img: Path,
+    rel_path: str = "",
 ) -> str:
     body = protect_math(body)
 
@@ -155,6 +201,8 @@ def convert_body(
         lambda m: f"{m.group(1)}**{m.group(2).strip()}**" if m.group(2).strip() else m.group(1).rstrip(),
         body,
     )
+    # 위키링크가 마크다운 링크로 바뀐 뒤에 돌려야 링크 타깃을 건드리지 않는다.
+    body = curly_quotes(body, rel_path)
     return body.strip() + "\n"
 
 
@@ -301,7 +349,7 @@ def main() -> int:
         title, body = resolve_title(fm, body, path.stem)
         rel = path.relative_to(vault).as_posix()
         out = build_frontmatter(title, fm, rel, slug) + convert_body(
-            body, vault, published, static_img
+            body, vault, published, static_img, rel
         )
         dest = posts_dir / f"{route}.md"
         written.add(f"{route}.md")
@@ -324,7 +372,7 @@ def main() -> int:
         if dir_slug in index_written:
             print(f"  [warn] 시리즈 '{series}' 목차 노트가 둘 이상, {rel} 로 덮어씀", file=sys.stderr)
         out = build_index_frontmatter(title, fm, rel) + convert_body(
-            body, vault, published, static_img
+            body, vault, published, static_img, rel
         )
         dest = posts_dir / dir_slug / "_index.md"
         written.add(f"{dir_slug}/_index.md")
