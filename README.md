@@ -67,6 +67,32 @@ Obsidian 볼트(`흑요석`)의 완성된 노트를 Hugo로 공개하는 사이�
 이후 건드리지 않는다(손으로 써도 된다). 목차 노트의 `publish: true`를 지우고 동기화하면
 생성됐던 `_index.md`는 삭제되고 같은 실행에서 최소 형태로 다시 만들어진다.
 
+## 조회수 확인
+
+| 어디서 | 무엇을 |
+|---|---|
+| [heukyoseok.goatcounter.com](https://heukyoseok.goatcounter.com) | 글별 조회수, 유입 경로, 브라우저·국가 |
+| [Search Console](https://search.google.com/search-console) | 구글 검색 노출수·클릭수·검색어, 색인 상태 |
+
+GoatCounter는 방문 즉시, Search Console은 며칠 뒤부터 데이터가 쌓인다. 둘 다 설치
+시점(2026-09-09) 이후만 집계되고 그 전 트래픽은 복구할 수 없다.
+
+조회수가 0으로 보이면 대개 **애드블로커**가 `gc.zgo.at`을 막은 것이다. 시크릿 창이나
+다른 브라우저로 확인해 본다. 로컬 `hugo server`는 development 환경이라 스크립트가 아예
+붙지 않으므로, 글을 미리 보는 것은 조회수에 잡히지 않는다.
+
+### 어떻게 붙어 있나
+
+| 파일 | 역할 |
+|---|---|
+| `hugo.toml`의 `params.goatcounterCode` | GoatCounter 계정 이름(`heukyoseok`). 비우면 스크립트가 안 붙는다 |
+| `layouts/partials/extend_head.html` | 위 값이 있고 프로덕션 빌드일 때만 카운터 스크립트를 삽입 |
+| `static/googlefdbb4d5b1482d5de.html` | Search Console 소유권 확인 파일. **지우면 인증이 풀린다** |
+| `hugo.toml`의 `params.analytics.google.SiteVerificationTag` | 파일 대신 메타태그로 인증할 때 쓰는 대안. 지금은 비어 있다 |
+
+시리즈로 옮기기 전의 평면 URL에 걸린 alias는 리다이렉트 스텁이라 스크립트가 없지만,
+곧바로 실제 글로 넘어가 거기서 집계된다.
+
 ## 초기 설정 (최초 1회)
 
 - GitHub에 `heukyoseok-blog` 레포 생성 후 push
