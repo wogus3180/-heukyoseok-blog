@@ -1,7 +1,7 @@
 ---
 title: "5강. 기댓값, Lᵖ 공간, 부등식"
 date: 2026-09-04
-lastmod: 2026-09-09
+lastmod: 2026-09-11
 draft: false
 math: true
 description: "ERM이 전제하는 손실의 기댓값은 정말 항상 존재하는가에서 출발해, 기댓값이 새로운 연산이 아니라 확률측도에 대한 르베그 적분일 뿐임을 보이고 LOTUS를 push-forward의 적분 공식으로 회수한다. Lᵖ를 '함수 하나가 곧 벡터 하나'인 함수공간으로 소개한 뒤 확률공간에서의 포함관계를 Hölder로 증명하고, Jensen·Hölder·Cauchy–Schwarz·Markov·Chebyshev를 각각 언제 꺼내는 도구인지로 정리한다."

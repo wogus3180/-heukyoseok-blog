@@ -7,7 +7,6 @@ description: "해석학을 따로 배운 적 없는 AI 전공자를 위한 측�
 summary: "σ-대수부터 확률 커널과 SDE까지, ML 논문의 측도론적 언어를 읽기 위한 강의 노트 시리즈."
 upcoming_title: "앞으로 올라올 강"
 upcoming:
-  - "**7강 — 곱측도, Fubini, 독립성** · iid의 정확한 의미"
   - "**8강 — Radon–Nikodym과 밀도** · 밀도는 언제 존재하는가, KL과 importance sampling"
   - "**9강 — 조건부 기댓값** · 확률 0인 사건에 조건화하기, 회귀 = L² 사영"
   - "**10강 — 확률 커널과 측도론적 베이즈 정리** · disintegration"

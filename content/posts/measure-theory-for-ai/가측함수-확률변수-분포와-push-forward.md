@@ -1,7 +1,7 @@
 ---
 title: "3강. 가측함수, 확률변수, 분포와 Push-forward"
 date: 2026-08-26
-lastmod: 2026-09-09
+lastmod: 2026-09-11
 draft: false
 math: true
 description: "확률변수가 왜 가측함수여야 하는지에서 출발해, 분포를 push-forward 측도로 정의한다. CDF 하나가 분포 전체를 결정하는 이유, 이산도 연속도 아닌 Cantor 분포, 그리고 역변환 샘플링·reparameterization trick·normalizing flow·GAN이 모두 같은 push-forward라는 것까지 정리한다."
