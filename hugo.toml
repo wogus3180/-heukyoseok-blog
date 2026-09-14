@@ -1,7 +1,7 @@
 baseURL = "https://example.org/"  # CI가 GitHub Pages URL로 자동 덮어씀
 languageCode = "ko-kr"
 defaultContentLanguage = "ko"
-title = "흑요석"
+title = "수학증류소"
 theme = "PaperMod"
 enableRobotsTXT = true
 hasCJKLanguage = true
@@ -11,7 +11,7 @@ timeZone = "Asia/Seoul"
   pagerSize = 10
 
 [params]
-  description = "수학·AI·로보틱스 학습 노트를 완성된 글로 정리한 블로그"
+  description = "딥러닝·동역학 같은 공학 개념의 수학적 기반을 정리하는 블로그"
   defaultTheme = "auto"
   ShowReadingTime = true
   ShowShareButtons = false
@@ -26,8 +26,8 @@ timeZone = "Asia/Seoul"
   goatcounterCode = "heukyoseok"
 
   [params.homeInfoParams]
-    Title = "흑요석"
-    Content = "측도론, 제어이론, 강화학습 등 공부한 내용을 글로 정리합니다."
+    Title = "수학증류소"
+    Content = "공학에서 쓰는 개념을 수학부터 다시 세웁니다. 측도론, 동역학, 강화학습."
 
   [params.analytics.google]
     # Search Console 소유권 확인용 HTML 태그의 content 값
