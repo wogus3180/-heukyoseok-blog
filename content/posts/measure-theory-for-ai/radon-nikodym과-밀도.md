@@ -1,7 +1,7 @@
 ---
 title: "8강. Radon–Nikodym과 밀도 — pdf, likelihood, KL"
 date: 2026-09-11
-lastmod: 2026-09-14
+lastmod: 2026-09-21
 draft: false
 math: true
 description: "모든 확률분포에 정말 pdf가 있는가. 밀도는 기준측도에 대한 비율 dP/dμ이고, 이 비율이 존재할 조건인 절대연속을 이해하면 pdf·pmf·likelihood·KL·importance weight가 한 언어로 읽힌다."

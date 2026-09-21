@@ -1,7 +1,7 @@
 ---
 title: "7강. 곱측도, Fubini, 독립성 — iid의 정확한 의미"
 date: 2026-09-09
-lastmod: 2026-09-14
+lastmod: 2026-09-21
 draft: false
 math: true
 description: "데이터셋을 P^n에서 뽑는다는 한 줄이 측도론적으로 무엇을 주장하는가. 독립성은 공동분포가 곱측도라는 구조적 명제이고, 그 위의 적분을 반복적분으로 바꾸는 도구가 Tonelli와 Fubini다."
